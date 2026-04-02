@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VC Term Sheet Decoder (MVP)
 
-## Getting Started
+Legal-tech **MVP** for founders: paste VC term-sheet language (liquidation preference, anti-dilution, etc.) and get a **risk index (0–100)**, plain-English **verdicts**, **negotiation tips**, and **pattern‑based flags** (e.g. participating preferred, 2x/3x, full ratchet).
 
-First, run the development server:
+**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion · **Gemini** or **OpenAI** (optional) + heuristics.
+
+---
+
+## Features
+
+- **Clause analyzer** — Large textarea + `/api/analyze` server route
+- **Risk gauge** — Semi-circle SVG + progress bar
+- **Snapshot** — Plain-English verdict (green / amber / red bands) + copy-to-clipboard
+- **Heuristic rules** — Non-participating vs participating, 1x vs 2x/3x, full ratchet, merged with AI when configured
+- **Auth UI (demo)** — Login / Sign up + session in `localStorage` + profile avatar (initial)
+- **AI providers** — Gemini first (`GEMINI_API_KEY`), then OpenAI (`OPENAI_API_KEY`), else heuristics only
+
+---
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # then add your keys (see below)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If port **3000** is busy or you see stale errors:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev:clean
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Copy `.env.example` to **`.env.local`** (recommended) or `.env`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Purpose |
+|----------|---------|
+| `GEMINI_API_KEY` | Google Gemini — used **first** if set ([AI Studio](https://aistudio.google.com/apikey)) |
+| `GEMINI_MODEL` | Optional; default `gemini-2.0-flash` |
+| `OPENAI_API_KEY` | OpenAI — used if Gemini is not configured |
+| `OPENAI_MODEL` | Optional; default `gpt-4o-mini` |
 
-## Deploy on Vercel
+Never commit real keys. `.env` and `.env*.local` are gitignored.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Next.js dev server |
+| `npm run dev:clean` | Clear `.next`, free ports 3000–3005, dev on **3000** |
+| `npm run build` | Production build |
+| `npm run start` | Run production server |
+| `npm run lint` | ESLint |
+
+---
+
+## Project structure (high level)
+
+```
+src/
+  app/
+    api/analyze/route.ts   # POST JSON → AnalysisResult
+    login/ signup/ profile/
+    page.tsx               # Decoder home
+  components/
+    term-sheet-decoder.tsx
+    risk-gauge.tsx
+    site-header-nav.tsx
+    ui/                    # shadcn components
+  lib/
+    analyzer.ts            # Heuristics + Gemini + OpenAI
+    auth-session.ts        # Client session helpers
+```
+
+---
+
+## Deploy
+
+Works on [Vercel](https://vercel.com): set `GEMINI_API_KEY` or `OPENAI_API_KEY` in project **Environment Variables**.
+
+---
+
+## License
+
+MIT
+
+---
+
+## Author
+
+[Saad18819](https://github.com/Saad18819) — [vc-decoder-mvp](https://github.com/Saad18819/vc-decoder-mvp)
